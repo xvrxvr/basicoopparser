@@ -3,6 +3,7 @@
 #include <ctype.h>
 
 #include "gram_parse.h"
+#include "func.h"
 
 namespace AST_Parse {
 
@@ -55,6 +56,32 @@ double BisonParser::get_var_value(std::string id)
 
 }
 */
+
+
+		FuncOp::FuncOp(const char* id, ParamList* pl) : ASTNode(OPC_Func) 
+		{
+			while(pl)
+			{
+				args.push_back(pl->expr);
+				ParamList* pp=pl;
+				pl=pl->next;
+				delete pp;
+			}
+			func_id=GF_Fabric::create(id);
+			if (!func_id) 
+			{
+				printf("Error: Function '%s' not found\nHACK HACK HACK!!!!\n",id);
+				throw std::exception();
+			}
+		}
+
+GF_Fabric* GF_Fabric::root;
+
+double FuncOp::eval() const
+{
+	return func_id->eval(args);
+}
+
 
 void BisonParser::yyerror(const char* msg)
 {

@@ -1,12 +1,14 @@
 #pragma once
 
 #include <string>
+#include <vector>
 
 namespace AST_Parse {
 
 	enum OpCode {
 		OPC_Const,
 		OPC_Var,
+		OPC_Func,
 
 		OPC_UnOp = 0x1000,
 		OPC_Neg,
@@ -44,6 +46,7 @@ namespace AST_Parse {
 	class NodeVar;
 	class NodeUnOp;
 	class NodeBinOp;
+	class FuncOp;
 
 	class Visitor {
 	public:
@@ -51,6 +54,7 @@ namespace AST_Parse {
 		virtual void visit(NodeVar*)=0;
 		virtual void visit(NodeBinOp*)=0;
 		virtual void visit(NodeUnOp*)=0;
+		virtual void visit(FuncOp*) {}
 	};
 
 	class ASTNode {
@@ -117,6 +121,38 @@ namespace AST_Parse {
 		virtual void visit(Visitor *v) {v->visit(this);}
 
 		virtual double eval() const;
+	};
+
+	struct ParamList {
+		ASTNode* expr;
+		ParamList* next;
+
+		ParamList(ASTNode* n) {expr=n; next=NULL;}
+		ParamList* join(ParamList* l)
+		{
+			ParamList* p=this;
+			while(p->next) p=p->next;
+			p->next=l;
+			return this;
+		}
+	};
+
+	class GenericFunc;
+
+	class FuncOp : public ASTNode {
+		GenericFunc* func_id;
+		std::vector<NodePtr> args;
+
+	public:
+		FuncOp(const char* id, ParamList* pl);
+
+		virtual size_t get_child_count() const {return args.size();}
+		virtual NodePtr get_child(size_t index) const {return args[index];}
+		virtual void visit(Visitor *v) {v->visit(this);}
+
+		virtual double eval() const;
+
+		GenericFunc* get_func() const {return func_id;}
 	};
 
 }

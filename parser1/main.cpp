@@ -115,3 +115,18 @@ int main()
 	}
 	return 0;
 }
+
+using namespace AST_Parse;
+
+class Func_sin : public GenericFunc {
+public:
+	Func_sin(int) {}
+
+	virtual double eval(const std::vector<NodePtr>& args, Visitor *visitor=NULL) const 
+	{
+		return sin(args[0]->eval());
+	}
+	virtual std::string get_id() const {return "sin";}
+	
+};
+FUNC(sin);

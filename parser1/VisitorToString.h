@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Tree.h"
+#include "func.h"
 
 namespace AST_Parse {
 
@@ -53,6 +54,19 @@ namespace AST_Parse {
 		 prio=999;
 	     if (ch_prio <= prio) s="("+s+")";
 	     res=ids[v->get_opcode()&0xFF] + s;
+		}
+
+		virtual void visit(FuncOp* func)
+		{
+			std::string rv=func->get_func()->get_id();
+			rv+="(";
+			for(size_t i=0;i<func->get_child_count();++i)
+			{
+				func->get_child(i)->visit(this);
+				rv+=res;
+				if (i+1<func->get_child_count()) rv+=",";
+			}
+			res=rv+")";
 		}
 
 	};
