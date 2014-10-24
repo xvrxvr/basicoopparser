@@ -77,12 +77,6 @@ double BisonParser::get_var_value(std::string id)
 
 GF_Fabric* GF_Fabric::root;
 
-double FuncOp::eval() const
-{
-	return func_id->eval(args);
-}
-
-
 void BisonParser::yyerror(const char* msg)
 {
 	fprintf(stderr,"%s\n",msg);

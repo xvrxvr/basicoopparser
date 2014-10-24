@@ -40,6 +40,12 @@ namespace AST_Parse {
 		NodePtr& operator =(const NodePtr&p) {assign(p.ptr); return *this;}
 
 		ASTNode* operator -> () const {return ptr;}
+
+		template<class Type>
+		Type* as() {return (Type*)ptr;}
+		template<class Type>
+		const Type* as() const {return (Type*)ptr;}
+
 	};
 
 	class NodeConst;
@@ -48,14 +54,27 @@ namespace AST_Parse {
 	class NodeBinOp;
 	class FuncOp;
 
+	template<class Ret>
 	class Visitor {
 	public:
-		virtual void visit(NodeConst*)=0;
-		virtual void visit(NodeVar*)=0;
-		virtual void visit(NodeBinOp*)=0;
-		virtual void visit(NodeUnOp*)=0;
-		virtual void visit(FuncOp*) {}
+		virtual Ret visit(NodeConst*)=0;
+		virtual Ret visit(NodeVar*)=0;
+		virtual Ret visit(NodeBinOp*)=0;
+		virtual Ret visit(NodeUnOp*)=0;
+		virtual Ret visit(FuncOp*) =0;
 	};
+
+#define VISIT_DEF \
+		virtual void visit(Visitor<void>*) =0; \
+		virtual std::string visit(Visitor<std::string>*) =0; \
+		virtual NodePtr visit(Visitor<NodePtr>*) =0; \
+		virtual double visit(Visitor<double>*)=0;
+
+#define VISIT \
+	virtual void visit(Visitor<void>* v) {v->visit(this);} \
+		virtual std::string visit(Visitor<std::string>* v) {return v->visit(this);} \
+		virtual NodePtr visit(Visitor<NodePtr>* v) {return v->visit(this);} \
+		virtual double visit(Visitor<double>* v) {return v->visit(this);}
 
 	class ASTNode {
 		const OpCode opcode;
@@ -70,9 +89,7 @@ namespace AST_Parse {
 		virtual size_t get_child_count() const =0;
 		virtual NodePtr get_child(size_t index) const =0;
 
-		virtual void visit(Visitor*) =0;
-
-		virtual double eval() const =0;
+		VISIT_DEF
 	};
 
 	class NodeConst : public ASTNode {
@@ -82,11 +99,9 @@ namespace AST_Parse {
 		virtual size_t get_child_count() const {return 0;}
 		virtual NodePtr get_child(size_t index) const {return NodePtr();}
 
-		virtual void visit(Visitor *v) {v->visit(this);}
+		VISIT
 
 		double get_value() const {return value;}
-
-		virtual double eval() const {return value;}
 	};
 
 	class NodeVar : public ASTNode {
@@ -95,10 +110,8 @@ namespace AST_Parse {
 		NodeVar(const std::string& n) : ASTNode(OPC_Var), var_name(n) {}
 		virtual size_t get_child_count() const {return 0;}
 		virtual NodePtr get_child(size_t index) const {return NodePtr();}
-		virtual void visit(Visitor *v) {v->visit(this);}
+		VISIT
 		std::string get_value() const {return var_name;}
-
-		virtual double eval() const {return 0;}
 	};
 
 	class NodeUnOp : public ASTNode {
@@ -107,9 +120,7 @@ namespace AST_Parse {
 		NodeUnOp(OpCode op, NodePtr c) : ASTNode(op), child(c) {}
 		virtual size_t get_child_count() const {return 1;}
 		virtual NodePtr get_child(size_t index) const {return child;}
-		virtual void visit(Visitor *v) {v->visit(this);}
-
-		virtual double eval() const;
+		VISIT
 	};
 
 	class NodeBinOp : public ASTNode {
@@ -118,9 +129,7 @@ namespace AST_Parse {
 		NodeBinOp(OpCode op, NodePtr l, NodePtr r) : ASTNode(op), left(l), right(r) {}
 		virtual size_t get_child_count() const {return 2;}
 		virtual NodePtr get_child(size_t index) const {return index?right:left;}
-		virtual void visit(Visitor *v) {v->visit(this);}
-
-		virtual double eval() const;
+		VISIT
 	};
 
 	struct ParamList {
@@ -148,9 +157,7 @@ namespace AST_Parse {
 
 		virtual size_t get_child_count() const {return args.size();}
 		virtual NodePtr get_child(size_t index) const {return args[index];}
-		virtual void visit(Visitor *v) {v->visit(this);}
-
-		virtual double eval() const;
+		VISIT
 
 		GenericFunc* get_func() const {return func_id;}
 	};

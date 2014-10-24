@@ -4,6 +4,7 @@
 
 #include "gram_parse.h"
 #include "VisitorToString.h"
+#include "Eval.h"
 
 /*
 
@@ -110,8 +111,10 @@ int main()
 //		Lexer L(buf);
 		AST_Parse::NodePtr ex= BP.parse(buf);
 		AST_Parse::VisitorToString vis;
-		ex->visit(&vis);
-		printf("%s = %g (%s)\n",buf,/*expr(L)*/ ex->eval(), vis.res.c_str());
+		AST_Parse::EvalVisitor eval;
+		std::string res=ex->visit(&vis);
+		std::string ev=ex->visit(&eval)->visit(&vis);
+		printf("%s = %s (%s)\n",buf,/*expr(L)*/ ev.c_str(), res.c_str());
 	}
 	return 0;
 }
@@ -122,10 +125,6 @@ class Func_sin : public GenericFunc {
 public:
 	Func_sin(int) {}
 
-	virtual double eval(const std::vector<NodePtr>& args, Visitor *visitor=NULL) const 
-	{
-		return sin(args[0]->eval());
-	}
 	virtual std::string get_id() const {return "sin";}
 	
 };

@@ -8,7 +8,6 @@ class GenericFunc {
 public:
 	virtual ~GenericFunc() {}
 
-	virtual double eval(const std::vector<NodePtr>& args, Visitor *visitor=NULL) const =0;
 	virtual std::string get_id() const =0;
 };
 

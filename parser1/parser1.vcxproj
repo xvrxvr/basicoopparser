@@ -95,9 +95,11 @@
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Eval.h" />
     <ClInclude Include="func.h" />
     <ClInclude Include="gramm.tab.h" />
     <ClInclude Include="gram_parse.h" />
+    <ClInclude Include="MultiMethod.h" />
     <ClInclude Include="Tree.h" />
     <ClInclude Include="VisitorToString.h" />
   </ItemGroup>
