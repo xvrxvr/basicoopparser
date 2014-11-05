@@ -76,6 +76,12 @@ namespace AST_Parse {
 		virtual NodePtr visit(Visitor<NodePtr>* v) {return v->visit(this);} \
 		virtual double visit(Visitor<double>* v) {return v->visit(this);}
 
+#define VISIT_FUNC(Ret) \
+		virtual Ret visit(FuncOp* func) \
+	     { \
+		  return MultiMethod<Ret>::get_instance().call(func->get_func(),this); \
+	     }
+
 	class ASTNode {
 		const OpCode opcode;
 		size_t ref_count;

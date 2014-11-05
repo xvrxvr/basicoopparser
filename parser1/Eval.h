@@ -1,8 +1,13 @@
 #include "Tree.h"
+#include "MultiMethod.h"
 
 namespace AST_Parse {
 
+	typedef std::map<std::string,NodePtr> VarsMap;
+
 	class EvalVisitor : public Visitor<NodePtr> {
+		VarsMap& vars;
+
 		NodePtr reduce(NodeBinOp* v, double left, NodePtr right)
 		{
 				switch(v->get_opcode())
@@ -54,8 +59,14 @@ namespace AST_Parse {
 		}
 
 	public:
+		EvalVisitor(VarsMap& vm) : vars(vm) {}
+
 		virtual NodePtr visit(NodeConst* v) {return v;}
-		virtual NodePtr visit(NodeVar* v) {return v;}
+		virtual NodePtr visit(NodeVar* v) 
+		{
+			if (vars.count(v->get_value())) return vars[v->get_value()];
+			return v;
+		}
 		virtual NodePtr visit(NodeBinOp* v)
 		{
 			NodePtr left=v->get_child(0)->visit(this);
@@ -83,7 +94,8 @@ namespace AST_Parse {
 			}
 
 		}
-		virtual NodePtr visit(FuncOp *v) {return v;}
+//		virtual NodePtr visit(FuncOp *v) {return v;}
+		VISIT_FUNC(NodePtr)
 
 	};
 

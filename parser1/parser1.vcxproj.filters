@@ -50,6 +50,9 @@
     <ClInclude Include="MultiMethod.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="EvalSystem.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="gramm.y">

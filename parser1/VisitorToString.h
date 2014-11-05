@@ -52,6 +52,8 @@ namespace AST_Parse {
 	     return ids[v->get_opcode()&0xFF] + s;
 		}
 
+//		VISIT_FUNC(std::string)
+
 		virtual std::string visit(FuncOp* func)
 		{
 			std::string rv=func->get_func()->get_id();

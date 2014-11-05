@@ -2,10 +2,7 @@
 #include <ctype.h>
 #include <stdlib.h>
 
-#include "gram_parse.h"
-#include "VisitorToString.h"
-#include "Eval.h"
-
+#include "EvalSystem.h"
 /*
 
 expr: mul_exp { '+'|'-'  mul_exp }
@@ -103,18 +100,15 @@ char buf[1024];
 
 int main()
 {
-	AST_Parse::BisonParser BP;
+	EvalSystem<> es;
 	for(;;)
 	{
 		printf("> ");
 		gets(buf);
-//		Lexer L(buf);
-		AST_Parse::NodePtr ex= BP.parse(buf);
-		AST_Parse::VisitorToString vis;
-		AST_Parse::EvalVisitor eval;
-		std::string res=ex->visit(&vis);
-		std::string ev=ex->visit(&eval)->visit(&vis);
-		printf("%s = %s (%s)\n",buf,/*expr(L)*/ ev.c_str(), res.c_str());
+		auto ex= es.compile(buf);
+		std::string res=ex.to_string();
+		std::string ev=ex.eval().to_string();
+		printf("%s = %s (%s)\n",buf,ev.c_str(), res.c_str());
 	}
 	return 0;
 }
