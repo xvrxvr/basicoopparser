@@ -112,14 +112,3 @@ int main()
 	}
 	return 0;
 }
-
-using namespace AST_Parse;
-
-class Func_sin : public GenericFunc {
-public:
-	Func_sin(int) {}
-
-	virtual std::string get_id() const {return "sin";}
-	
-};
-FUNC(sin);

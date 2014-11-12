@@ -9,6 +9,15 @@ namespace AST_Parse {
 
 #include "gramm.tab.h"
 
+bool BisonParser::my_alnum(int sym)
+{
+	if (isalnum(sym)) return true;
+	if (sym=='_' || sym=='$') return true;
+	if (extra && strchr(extra,sym)) return true;
+	return false;
+}
+
+
 int BisonParser::yylex(void* rv)
 {
 	while(*input)
@@ -19,10 +28,10 @@ int BisonParser::yylex(void* rv)
 			*(double*)rv=strtod(input,(char**)&input);
 			return vNUM;
 		}
-		if (isalnum(*input))
+		if (my_alnum(*input))
 		{
 			const char* start=input;
-			while(isalnum(*input)) ++input;
+			while(my_alnum(*input)) ++input;
 			char* mem=new char[input-start+1]; //!!! Memory leak - fix me !!!
 			memcpy(mem,start,input-start);
 			mem[input-start]=0;

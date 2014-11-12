@@ -79,7 +79,7 @@ namespace AST_Parse {
 #define VISIT_FUNC(Ret) \
 		virtual Ret visit(FuncOp* func) \
 	     { \
-		  return MultiMethod<Ret>::get_instance().call(func->get_func(),this); \
+		  return MultiMethod<Ret>::get_instance().call(func,func->get_func(),this); \
 	     }
 
 	class ASTNode {
@@ -160,6 +160,11 @@ namespace AST_Parse {
 
 	public:
 		FuncOp(const char* id, ParamList* pl);
+		FuncOp(GenericFunc* fid, NodePtr arg) : ASTNode(OPC_Func)
+		{
+			func_id=fid;
+			args.push_back(arg);
+		}
 
 		virtual size_t get_child_count() const {return args.size();}
 		virtual NodePtr get_child(size_t index) const {return args[index];}
